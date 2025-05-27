@@ -8,40 +8,46 @@ Transform your Cinnamon desktop with **native tiling gaps** built directly into 
 
 ## 📖 Table of Contents
 
-- [What is This Project?](#what-is-this-project)
-- [Why Patching is Necessary](#why-patching-is-necessary)
-- [Key Features & Optimizations](#key-features--optimizations)
-- [Dependencies](#dependencies)
-- [Installation Guide](#installation-guide)
-- [How to Run](#how-to-run)
-- [Configuration](#configuration)
-- [How to Uninstall](#how-to-uninstall)
-- [Troubleshooting](#troubleshooting)
-- [Technical Information](#technical-information)
-- [Contributing](#contributing)
-- [License](#license)
+- [What is This Project?](#-what-is-this-project)
+- [Why Patching is Necessary](#-why-patching-is-necessary)
+- [Key Features & Optimizations](#-key-features--optimizations)
+- [Dependencies](#-dependencies)
+- [Installation Guide](#-installation-guide)
+- [How to Run](#-how-to-run)
+- [Configuration](#️-configuration)
+- [How to Uninstall](#-how-to-uninstall)
+- [Troubleshooting](#-troubleshooting)
+- [Technical Information](#-technical-information)
+- [Contributing](#-contributing)
+- [License](#-license)
 
 ---
 
 ## 🎯 What is This Project?
 
 ### **Muffin Window Manager**
+
 **Muffin** is the core window manager that powers the Cinnamon desktop environment, used primarily in:
+
 - **Linux Mint** (default window manager)
 - **Ubuntu Cinnamon** and other Cinnamon-based distributions
 - **Any Linux distribution** running the Cinnamon desktop
 
 ### **Tiling Gaps Enhancement**
+
 This project extends Muffin with **native tiling gaps functionality** - customizable spaces between windows when using window tiling features. Unlike external tools or extensions, these gaps are integrated directly into the window manager's core.
 
 ### **Performance Optimizations**
+
 This implementation includes comprehensive performance optimizations:
+
 - **60% faster** gap calculations through bit operations and caching
 - **80% fewer** GSettings calls via intelligent cache system
 - **25% less** memory usage through optimized data structures
 - **15% overall** performance improvement with compiler optimizations
 
 ### **Supported Environments**
+
 - ✅ **Linux Mint** (all versions with Cinnamon)
 - ✅ **Ubuntu Cinnamon** and derivatives
 - ✅ **Debian** with Cinnamon desktop
@@ -54,6 +60,7 @@ This implementation includes comprehensive performance optimizations:
 ## 🔧 Why Patching is Necessary
 
 ### **The Challenge**
+
 Muffin, like most traditional window managers, was designed without native tiling gaps support. Adding gaps requires modifying the core window positioning and sizing logic at the window manager level.
 
 ### **Why Not Use External Tools?**
@@ -869,8 +876,8 @@ Contributions are welcome! This project enhances the Cinnamon desktop experience
 ```bash
 # 1. Fork the repository on your preferred platform
 # 2. Clone your fork
-git clone <your-fork-url>
-cd muffin-tiling-gaps
+git clone https://github.com/mohdismailmatasin/muffin.git
+cd muffin
 
 # 3. Install development dependencies
 sudo apt install -y build-essential meson ninja-build
@@ -949,8 +956,8 @@ See the [COPYING](COPYING) file for the complete license text.
 
 ### Quick Links
 
-- **Installation Issues**: See [Troubleshooting](#troubleshooting) section
-- **Configuration Help**: See [Configuration](#configuration) section
+- **Installation Issues**: See the Troubleshooting section
+- **Configuration Help**: See the Configuration section
 - **Bug Reports**: Use the test script and provide detailed logs
 - **Feature Requests**: Check existing issues before submitting new ones
 
