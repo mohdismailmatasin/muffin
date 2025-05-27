@@ -7242,66 +7242,100 @@ meta_window_get_current_tile_monitor_number (MetaWindow *window)
   return tile_monitor_number;
 }
 
+/* Cache for gap settings to avoid repeated GSettings calls */
+static struct {
+  gboolean enabled;
+  gint gap_size;
+  gint outer_gap_size;
+  gboolean cached;
+} gap_cache = { FALSE, 10, 10, FALSE };
+
+static void
+update_gap_cache (void)
+{
+  if (!gap_cache.cached)
+    {
+      gap_cache.enabled = meta_prefs_get_tiling_gaps_enabled ();
+      gap_cache.gap_size = meta_prefs_get_tiling_gap_size ();
+      gap_cache.outer_gap_size = meta_prefs_get_tiling_outer_gap_size ();
+      gap_cache.cached = TRUE;
+    }
+}
+
+void
+meta_window_invalidate_gap_cache (void)
+{
+  gap_cache.cached = FALSE;
+}
+
+static inline void
+apply_tiling_gaps_fast (MetaTileMode   tile_mode,
+                        MetaRectangle *tile_area,
+                        gint           gap,
+                        gint           outer_gap)
+{
+  /* Apply outer gaps first - these are always the same */
+  tile_area->x += outer_gap;
+  tile_area->y += outer_gap;
+  tile_area->width -= (outer_gap << 1);  /* Faster than 2 * outer_gap */
+  tile_area->height -= (outer_gap << 1);
+
+  /* Apply inner gaps based on tile mode - optimized with bit operations where possible */
+  const gint half_gap = gap >> 1;  /* Faster than gap / 2 */
+
+  switch (tile_mode)
+    {
+    case META_TILE_LEFT:
+      tile_area->width -= half_gap;
+      break;
+    case META_TILE_RIGHT:
+      tile_area->x += half_gap;
+      tile_area->width -= half_gap;
+      break;
+    case META_TILE_TOP:
+      tile_area->height -= half_gap;
+      break;
+    case META_TILE_BOTTOM:
+      tile_area->y += half_gap;
+      tile_area->height -= half_gap;
+      break;
+    case META_TILE_ULC:
+      tile_area->width -= half_gap;
+      tile_area->height -= half_gap;
+      break;
+    case META_TILE_URC:
+      tile_area->x += half_gap;
+      tile_area->width -= half_gap;
+      tile_area->height -= half_gap;
+      break;
+    case META_TILE_LLC:
+      tile_area->width -= half_gap;
+      tile_area->y += half_gap;
+      tile_area->height -= half_gap;
+      break;
+    case META_TILE_LRC:
+      tile_area->x += half_gap;
+      tile_area->width -= half_gap;
+      tile_area->y += half_gap;
+      tile_area->height -= half_gap;
+      break;
+    default:
+      break;
+    }
+}
+
 static void
 apply_tiling_gaps (MetaWindow    *window,
                    MetaTileMode   tile_mode,
                    MetaRectangle *tile_area,
                    MetaRectangle *work_area)
 {
-  gint gap, outer_gap;
+  update_gap_cache ();
 
-  if (!meta_prefs_get_tiling_gaps_enabled ())
+  if (G_UNLIKELY (!gap_cache.enabled))
     return;
 
-  gap = meta_prefs_get_tiling_gap_size ();
-  outer_gap = meta_prefs_get_tiling_outer_gap_size ();
-
-  /* Apply outer gaps */
-  tile_area->x += outer_gap;
-  tile_area->y += outer_gap;
-  tile_area->width -= 2 * outer_gap;
-  tile_area->height -= 2 * outer_gap;
-
-  /* Apply inner gaps based on tile mode */
-  switch (tile_mode)
-    {
-    case META_TILE_LEFT:
-      tile_area->width -= gap / 2;
-      break;
-    case META_TILE_RIGHT:
-      tile_area->x += gap / 2;
-      tile_area->width -= gap / 2;
-      break;
-    case META_TILE_TOP:
-      tile_area->height -= gap / 2;
-      break;
-    case META_TILE_BOTTOM:
-      tile_area->y += gap / 2;
-      tile_area->height -= gap / 2;
-      break;
-    case META_TILE_ULC:
-      tile_area->width -= gap / 2;
-      tile_area->height -= gap / 2;
-      break;
-    case META_TILE_URC:
-      tile_area->x += gap / 2;
-      tile_area->width -= gap / 2;
-      tile_area->height -= gap / 2;
-      break;
-    case META_TILE_LLC:
-      tile_area->width -= gap / 2;
-      tile_area->y += gap / 2;
-      tile_area->height -= gap / 2;
-      break;
-    case META_TILE_LRC:
-      tile_area->x += gap / 2;
-      tile_area->width -= gap / 2;
-      tile_area->y += gap / 2;
-      tile_area->height -= gap / 2;
-      break;
-    default:
-      break;
-    }
+  apply_tiling_gaps_fast (tile_mode, tile_area, gap_cache.gap_size, gap_cache.outer_gap_size);
 }
 
 void

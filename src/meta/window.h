@@ -465,4 +465,7 @@ void meta_window_set_opacity              (MetaWindow *window,
 META_EXPORT
 guint8 meta_window_get_opacity              (MetaWindow *window);
 
+META_EXPORT
+void meta_window_invalidate_gap_cache (void);
+
 #endif

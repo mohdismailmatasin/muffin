@@ -296,6 +296,25 @@ if host_machine.cpu_family() == 'x86'
 endif
 add_project_arguments('-D_GNU_SOURCE', language: 'c')
 
+# Performance optimization flags
+performance_flags = [
+  '-O3',                    # Maximum optimization
+  '-march=native',          # Optimize for current CPU
+  '-mtune=native',          # Tune for current CPU
+  '-ffast-math',            # Fast math operations
+  '-funroll-loops',         # Unroll loops for speed
+  '-finline-functions',     # Inline functions aggressively
+  '-fomit-frame-pointer',   # Omit frame pointer for speed
+  '-flto',                  # Link-time optimization
+]
+
+# Apply performance flags for release builds
+if get_option('buildtype') == 'release'
+  supported_perf_flags = cc.get_supported_arguments(performance_flags)
+  add_project_arguments(supported_perf_flags, language: 'c')
+  message('Applied performance optimizations: ' + ' '.join(supported_perf_flags))
+endif
+
 buildtype = get_option('buildtype')
 if buildtype != 'plain'
   all_warnings = [

@@ -844,7 +844,13 @@ handle_preference_update_bool (GSettings *settings,
 
   /* Did it change?  If so, tell the listeners about it. */
   if (old_value != *((gboolean *)cursor->target))
-    queue_changed (cursor->base.pref);
+    {
+      /* Invalidate gap cache when tiling gaps settings change */
+      if (cursor->base.pref == META_PREF_TILING_GAPS_ENABLED)
+        meta_window_invalidate_gap_cache ();
+
+      queue_changed (cursor->base.pref);
+    }
 
   if (cursor->base.pref==META_PREF_DISABLE_WORKAROUNDS)
     maybe_give_disable_workarounds_warning ();
@@ -963,6 +969,12 @@ handle_preference_update_int (GSettings *settings,
   if (*cursor->target != new_value)
     {
       *cursor->target = new_value;
+
+      /* Invalidate gap cache when gap size settings change */
+      if (cursor->base.pref == META_PREF_TILING_GAP_SIZE ||
+          cursor->base.pref == META_PREF_TILING_OUTER_GAP_SIZE)
+        meta_window_invalidate_gap_cache ();
+
       queue_changed (cursor->base.pref);
     }
 }

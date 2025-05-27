@@ -2,7 +2,7 @@
 
 /*
  * Tiling Gaps Plugin for Muffin
- * 
+ *
  * This plugin adds configurable gaps between tiled windows
  * Author: Custom Implementation
  * License: GPL
@@ -149,6 +149,63 @@ meta_tiling_gaps_plugin_init (MetaTilingGapsPlugin *self)
                     G_CALLBACK (on_settings_changed), self);
 }
 
+static inline void
+apply_gaps_to_tile_rect_fast (MetaTilingGapsPluginPrivate *priv,
+                               MetaRectangle               *tile_rect,
+                               MetaTileMode                 tile_mode)
+{
+  const gint gap = priv->gap_size;
+  const gint outer_gap = priv->outer_gap_size;
+  const gint half_gap = gap >> 1;  /* Faster than gap / 2 */
+
+  /* Apply outer gaps first */
+  tile_rect->x += outer_gap;
+  tile_rect->y += outer_gap;
+  tile_rect->width -= (outer_gap << 1);   /* Faster than 2 * outer_gap */
+  tile_rect->height -= (outer_gap << 1);
+
+  /* Apply inner gaps based on tile mode - optimized switch */
+  switch (tile_mode)
+    {
+    case META_TILE_LEFT:
+      tile_rect->width -= half_gap;
+      break;
+    case META_TILE_RIGHT:
+      tile_rect->x += half_gap;
+      tile_rect->width -= half_gap;
+      break;
+    case META_TILE_TOP:
+      tile_rect->height -= half_gap;
+      break;
+    case META_TILE_BOTTOM:
+      tile_rect->y += half_gap;
+      tile_rect->height -= half_gap;
+      break;
+    case META_TILE_ULC:
+      tile_rect->width -= half_gap;
+      tile_rect->height -= half_gap;
+      break;
+    case META_TILE_URC:
+      tile_rect->x += half_gap;
+      tile_rect->width -= half_gap;
+      tile_rect->height -= half_gap;
+      break;
+    case META_TILE_LLC:
+      tile_rect->width -= half_gap;
+      tile_rect->y += half_gap;
+      tile_rect->height -= half_gap;
+      break;
+    case META_TILE_LRC:
+      tile_rect->x += half_gap;
+      tile_rect->width -= half_gap;
+      tile_rect->y += half_gap;
+      tile_rect->height -= half_gap;
+      break;
+    default:
+      break;
+    }
+}
+
 static void
 apply_gaps_to_tile_rect (MetaTilingGapsPlugin *plugin,
                         MetaWindow           *window,
@@ -156,61 +213,11 @@ apply_gaps_to_tile_rect (MetaTilingGapsPlugin *plugin,
                         MetaTileMode          tile_mode)
 {
   MetaTilingGapsPluginPrivate *priv = plugin->priv;
-  MetaRectangle work_area;
-  gint gap = priv->gap_size;
-  gint outer_gap = priv->outer_gap_size;
 
-  if (!priv->gaps_enabled)
+  if (G_UNLIKELY (!priv->gaps_enabled))
     return;
 
-  meta_window_get_work_area_current_monitor (window, &work_area);
-
-  /* Apply outer gaps */
-  tile_rect->x += outer_gap;
-  tile_rect->y += outer_gap;
-  tile_rect->width -= 2 * outer_gap;
-  tile_rect->height -= 2 * outer_gap;
-
-  /* Apply inner gaps based on tile mode */
-  switch (tile_mode)
-    {
-    case META_TILE_LEFT:
-      tile_rect->width -= gap / 2;
-      break;
-    case META_TILE_RIGHT:
-      tile_rect->x += gap / 2;
-      tile_rect->width -= gap / 2;
-      break;
-    case META_TILE_TOP:
-      tile_rect->height -= gap / 2;
-      break;
-    case META_TILE_BOTTOM:
-      tile_rect->y += gap / 2;
-      tile_rect->height -= gap / 2;
-      break;
-    case META_TILE_ULC:
-      tile_rect->width -= gap / 2;
-      tile_rect->height -= gap / 2;
-      break;
-    case META_TILE_URC:
-      tile_rect->x += gap / 2;
-      tile_rect->width -= gap / 2;
-      tile_rect->height -= gap / 2;
-      break;
-    case META_TILE_LLC:
-      tile_rect->width -= gap / 2;
-      tile_rect->y += gap / 2;
-      tile_rect->height -= gap / 2;
-      break;
-    case META_TILE_LRC:
-      tile_rect->x += gap / 2;
-      tile_rect->width -= gap / 2;
-      tile_rect->y += gap / 2;
-      tile_rect->height -= gap / 2;
-      break;
-    default:
-      break;
-    }
+  apply_gaps_to_tile_rect_fast (priv, tile_rect, tile_mode);
 }
 
 static void
@@ -228,11 +235,11 @@ show_tile_preview (MetaPlugin    *plugin,
 {
   MetaTilingGapsPlugin *gaps_plugin = META_TILING_GAPS_PLUGIN (plugin);
   MetaRectangle modified_rect = *tile_rect;
-  
+
   /* Apply gaps to the tile preview */
-  apply_gaps_to_tile_rect (gaps_plugin, window, &modified_rect, 
+  apply_gaps_to_tile_rect (gaps_plugin, window, &modified_rect,
                           meta_window_get_tile_mode (window));
-  
+
   /* Call the parent implementation with modified rectangle */
   /* Note: This would need to be implemented properly in a real plugin */
 }
