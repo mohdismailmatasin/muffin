@@ -8,14 +8,14 @@ Transform your Cinnamon desktop with **native tiling gaps** built directly into 
 
 ## 📖 Table of Contents
 
-- [What is This Project?](#-what-is-this-project)
+- [What is Muffin?](#-what-is-muffin)
 - [Why Patching is Necessary](#-why-patching-is-necessary)
 - [Key Features & Optimizations](#-key-features--optimizations)
 - [Dependencies](#-dependencies)
 - [Installation Guide](#-installation-guide)
 - [How to Run](#-how-to-run)
 - [Configuration](#️-configuration)
-- [How to Uninstall](#-how-to-uninstall)
+- [How to Uninstall](#️-how-to-uninstall)
 - [Troubleshooting](#-troubleshooting)
 - [Technical Information](#-technical-information)
 - [Contributing](#-contributing)
@@ -23,7 +23,7 @@ Transform your Cinnamon desktop with **native tiling gaps** built directly into 
 
 ---
 
-## 🎯 What is This Project?
+## 🎯 What is Muffin?
 
 ### **Muffin Window Manager**
 
@@ -232,7 +232,7 @@ The automated installer handles everything for you:
 
 ```bash
 # 1. Navigate to the project directory
-cd /path/to/muffin-tiling-gaps
+cd /path/to/muffin
 
 # 2. Make the installer executable
 chmod +x install.sh
@@ -302,7 +302,7 @@ ldd /usr/bin/cinnamon | grep muffin
 
 If installation is successful, you should see:
 
-```
+```bash
 ✅ Tiling gaps functionality: WORKING
 ✅ GSettings schema: INSTALLED
 ✅ Configuration tools: AVAILABLE
@@ -642,7 +642,7 @@ If you want to reinstall later:
 
 #### Installation Problems
 
-**❌ Installation fails with dependency errors**
+❌ **Installation fails with dependency errors**
 
 ```bash
 # Solution: Ensure all build dependencies are installed
@@ -650,7 +650,7 @@ sudo apt update && sudo apt upgrade
 # Then re-run dependency installation commands
 ```
 
-**❌ Meson configuration fails**
+❌ **Meson configuration fails**
 
 ```bash
 # Solution: Clear build directory and reconfigure
@@ -658,7 +658,7 @@ rm -rf build/
 meson setup build --prefix=/usr/local
 ```
 
-**❌ Permission denied during installation**
+❌ **Permission denied during installation**
 
 ```bash
 # Solution: Ensure you have sudo privileges
@@ -668,7 +668,7 @@ sudo -v
 
 #### Runtime Problems
 
-**❌ Cinnamon crashes after installation**
+❌ **Cinnamon crashes after installation**
 
 ```bash
 # Solution: Restore original Muffin immediately
@@ -677,7 +677,7 @@ sudo -v
 journalctl -xe | grep cinnamon
 ```
 
-**❌ Gaps not appearing**
+❌ **Gaps not appearing**
 
 ```bash
 # Solution 1: Verify gaps are enabled
@@ -690,7 +690,7 @@ cinnamon --replace &
 ldd /usr/bin/cinnamon | grep muffin
 ```
 
-**❌ Settings not persisting**
+❌ **Settings not persisting**
 
 ```bash
 # Solution: Ensure GSettings schemas are compiled
@@ -700,7 +700,7 @@ sudo glib-compile-schemas /usr/share/glib-2.0/schemas/
 gsettings list-schemas | grep muffin
 ```
 
-**❌ GUI configuration tool won't start**
+❌ **GUI configuration tool won't start**
 
 ```bash
 # Solution: Check Python dependencies
@@ -712,7 +712,7 @@ sudo apt install python3-gi python3-gi-cairo gir1.2-gtk-3.0
 
 #### System Update Issues
 
-**❌ System updates overwrite the patch**
+❌ **System updates overwrite the patch**
 
 ```bash
 # Solution: Re-run the installer after system updates
@@ -720,7 +720,7 @@ sudo apt install python3-gi python3-gi-cairo gir1.2-gtk-3.0
 # Your settings and backup will be preserved
 ```
 
-**❌ Muffin package updates conflict**
+❌ **Muffin package updates conflict**
 
 ```bash
 # Solution: Hold Muffin package to prevent automatic updates
@@ -799,7 +799,7 @@ This patch modifies Muffin's window management code to:
 
 ### Architecture Overview
 
-```
+```bash
 ┌─────────────────────────────────────────────────────────────┐
 │                    Cinnamon Desktop                         │
 ├─────────────────────────────────────────────────────────────┤
@@ -969,6 +969,4 @@ See the [COPYING](COPYING) file for the complete license text.
 
 ---
 
-**Note**: This patch is designed specifically for Muffin/Cinnamon. For other window managers, consider alternatives like i3-gaps, bspwm, or similar tiling window managers with built-in gap support.
-
-**Enjoy your enhanced Cinnamon desktop experience with beautiful, configurable window gaps! 🎉**
+## Enjoy your enhanced Cinnamon desktop experience with beautiful, configurable window gaps! 🎉
