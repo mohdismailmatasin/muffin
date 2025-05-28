@@ -768,7 +768,7 @@ If Cinnamon becomes unusable:
 ```bash
 # 1. Switch to TTY (Ctrl+Alt+F1)
 # 2. Login and run uninstaller
-cd /path/to/muffin-tiling-gaps
+cd /path/to/muffin
 ./uninstall.sh
 
 # 3. Restart display manager
